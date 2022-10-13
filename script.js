@@ -85,17 +85,21 @@ const main = async () => {
             type: 'png'
         })
     } catch (error) {
-        console.log('error', error)
+        console.log('error script tennis :', error)
     } finally {
         await browser.close();
     }
 
 }
 // main()
-const reservation = new CronJob({
-    // cronTime: '0 * 12 * * *',
-    cronTime: '1 0 8 * * *',
-    onTick: main(),
-    timeZone: 'Europe/Paris',
-    start: true
-})
+try {
+    const reservation = new CronJob({
+        // cronTime: '0 * 12 * * *',
+        cronTime: '1 0 8 * * *',
+        onTick: main(),
+        timeZone: 'Europe/Paris',
+        start: true
+    })
+} catch (error) {
+    console.log('Error tâche cron :', error)
+}
