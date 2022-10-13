@@ -146,6 +146,17 @@ const main = async () => {
         }
     } catch (error) {
         console.log('Error launch browser', error)
+        const mailOption = {
+            from: '"[TENNIS-SCRIPT] " <' + process.env.EMAIL_OUTLOOK + '>', // sender address
+            // from: process.env.userMail, // sender address
+            to: 'eylon33@outlook.fr', // list of receivers
+            subject: `Browser launch error`, // Subject line
+            text: `La réservation a échoué ${error.message}`
+        };
+        await transporter.sendMail(mailOption, (err) => {
+            if (err) console.log(`Le mail n'a pas pu être envoyée`, err);
+            console.log(`Le mail a été envoyer avec succès`);
+        });
     }
 
 }
