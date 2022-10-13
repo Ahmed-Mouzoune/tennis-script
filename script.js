@@ -1,5 +1,14 @@
 require('dotenv').config();
 const CronJob = require('cron').CronJob;
+const nodemailer = require('nodemailer');
+const transporter = nodemailer.createTransport({
+    host: "ssl0.ovh.net", // hostname
+    port: 587, // port for secure SMTP
+    auth: {
+        user: process.env.EMAIL_OUTLOOK,
+        pass: process.env.PASSWORD_OUTLOOK
+    }
+});
 
 const main = async () => {
     if(!process.env.EMAIL || !process.env.PASSWORD) return console.log(`Définissez un nom d'utilisteur et un mot de passe`);
@@ -84,7 +93,42 @@ const main = async () => {
             fullPage: true,
             type: 'png'
         })
+        const mailOption = {
+            from: '"[TENNIS-SCRIPT] " <' + process.env.EMAIL_OUTLOOK + '>', // sender address
+            // from: process.env.userMail, // sender address
+            to: 'eylon33@outlook.fr', // list of receivers
+            subject: `[${date}] - Réservation cours de tennis à ${heure} h`, // Subject line
+            text: 'La réservation a été effectuer avec succès', 
+            attachments: [{
+                filename: `resa-${date}:${heure}.png`,
+                path: `${__dirname}/reservation/resa-${date}:${heure}.png`,
+                cid: 'reservation'
+            }],
+        };
+        await transporter.sendMail(mailOption, (err) => {
+            console.log(`Le mail n'a pas pu être envoyée`, err)
+        });
     } catch (error) {
+        await page.screenshot({
+            path: `${__dirname}/reservation/error-resa-${date}:${heure}.png`,
+            fullPage: true,
+            type: 'png'
+        })
+        const mailOption = {
+            from: '"[TENNIS-SCRIPT] " <' + process.env.EMAIL_OUTLOOK + '>', // sender address
+            // from: process.env.userMail, // sender address
+            to: 'eylon33@outlook.fr', // list of receivers
+            subject: `[${date}] - Réservation cours de tennis à ${heure} h`, // Subject line
+            text: 'La réservation a échoué', 
+            attachments: [{
+                filename: `error-resa-${date}:${heure}.png`,
+                path: `${__dirname}/reservation/error-resa-${date}:${heure}.png`,
+                cid: 'reservation'
+            }],
+        };
+        await transporter.sendMail(mailOption, (err) => {
+            console.log(`Le mail n'a pas pu être envoyée`, err)
+        });
         console.log('error script tennis :', error)
     } finally {
         await browser.close();
