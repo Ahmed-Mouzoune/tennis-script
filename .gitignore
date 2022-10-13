@@ -1,0 +1,8 @@
+## Session
+eylonSession
+## Package
+node_modules
+# Configuration
+.env
+# VSCODE
+.vscode
