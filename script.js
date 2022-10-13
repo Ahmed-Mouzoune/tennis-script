@@ -24,7 +24,7 @@ const main = async () => {
         // defaultViewport: null,
         userDataDir: `${__dirname}/eylonSession`,
         args: [
-            "--no-sandbox",
+            '--no-sandbox',
             '--window-size=1920,1080'
         ]
     })
