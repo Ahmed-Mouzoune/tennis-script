@@ -2,12 +2,12 @@ require('dotenv').config();
 const CronJob = require('cron').CronJob;
 
 const main = async () => {
-    if(!process.env.EMAIL || !process.env.PASSWORD) console.log(`Définissez un nom d'utilisteur et un mot de passe`)
-    // return console.log('process.env.EMAIL', process.env.EMAIL)
+    if(!process.env.EMAIL || !process.env.PASSWORD) return console.log(`Définissez un nom d'utilisteur et un mot de passe`);
     const puppeteer = require('puppeteer');
     
     const browser = await puppeteer.launch({
-        headless: false,
+        headless: true,
+        // headless: false,
         defaultViewport: null,
         userDataDir: `${__dirname}/eylonSession`
     })
