@@ -66,8 +66,10 @@ const main = async () => {
         await page.waitForTimeout(200);
         await page.click('[id="scroll-right"]');
         await page.waitForTimeout(200);
-        await page.waitForSelector(`[id="col-526-${date}"] > [data-start-hour="${heure}"]`);
-        await page.click(`[id="col-526-${date}"] > [data-start-hour="${heure}"]`);
+        await page.waitForSelector(`[id="track"] > div:nth-child(14) > [data-start-hour="${heure}"]`);
+        await page.click(`[id="track"] > div:nth-child(14) > [data-start-hour="${heure}"]`);
+        // await page.waitForSelector(`[id="col-526-${date}"] > [data-start-hour="${heure}"]`);
+        // await page.click(`[id="col-526-${date}"] > [data-start-hour="${heure}"]`);
         await page.waitForSelector('.modal--js-active');
         await page.type('[data-target="app--autocomplete.input"]', partenaire.firstname, {delay: 100});
         await page.waitForSelector(`[data-id="${partenaire.id}"]`, {
