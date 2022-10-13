@@ -20,11 +20,12 @@ const main = async () => {
     
     const browser = await puppeteer.launch({
         // headless: true,
-        headless: false,
-        defaultViewport: null,
+        // headless: false,
+        // defaultViewport: null,
         userDataDir: `${__dirname}/eylonSession`,
         args: [
-            "--no-sandbox"
+            "--no-sandbox",
+            '--window-size=1920,1080'
         ]
     })
     const pages = await browser.pages();
@@ -86,9 +87,7 @@ const main = async () => {
         await page.click(`[id="track"] > div:nth-child(14) > [data-start-hour="${heure}"]`);
         // await page.waitForSelector(`[id="col-526-${date}"] > [data-start-hour="${heure}"]`);
         // await page.click(`[id="col-526-${date}"] > [data-start-hour="${heure}"]`);
-        await page.waitForSelector('.modal--js-active', {
-            timeout: 20000
-        });
+        await page.waitForSelector('.modal--js-active');
         await page.type('[data-target="app--autocomplete.input"]', partenaire.firstname, {delay: 100});
         await page.waitForSelector(`[data-id="${partenaire.id}"]`, {
             visible: true
@@ -147,15 +146,15 @@ const main = async () => {
     }
 
 }
-main()
-// try {
-//     const reservation = new CronJob({
-//         // cronTime: '0 * 12 * * *',
-//         cronTime: '1 0 8 * * *',
-//         onTick: main(),
-//         timeZone: 'Europe/Paris',
-//         start: true
-//     })
-// } catch (error) {
-//     console.log('Error tâche cron :', error)
-// }
+// main()
+try {
+    const reservation = new CronJob({
+        // cronTime: '0 * 12 * * *',
+        cronTime: '1 0 8 * * *',
+        onTick: main(),
+        timeZone: 'Europe/Paris',
+        start: true
+    })
+} catch (error) {
+    console.log('Error tâche cron :', error)
+}
