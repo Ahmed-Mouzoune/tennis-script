@@ -149,8 +149,8 @@ const main = async () => {
 // main()
 try {
     const reservation = new CronJob({
-        // cronTime: '0 * 12 * * *',
-        cronTime: '1 0 8 * * *',
+        cronTime: '0 * * * * *',
+        // cronTime: '1 0 8 * * *',
         onTick: main(),
         timeZone: 'Europe/Paris',
         start: true
