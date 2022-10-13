@@ -2,8 +2,12 @@ require('dotenv').config();
 const CronJob = require('cron').CronJob;
 const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
-    host: "ssl0.ovh.net", // hostname
+    host: "smtp-mail.outlook.com", // hostname
+    secureConnection: false, // TLS requires secureConnection to be false
     port: 587, // port for secure SMTP
+    tls: {
+        ciphers:'SSLv3'
+    },
     auth: {
         user: process.env.EMAIL_OUTLOOK,
         pass: process.env.PASSWORD_OUTLOOK
@@ -11,14 +15,17 @@ const transporter = nodemailer.createTransport({
 });
 
 const main = async () => {
-    if(!process.env.EMAIL || !process.env.PASSWORD) return console.log(`Définissez un nom d'utilisteur et un mot de passe`);
+    if(!process.env.EMAIL_ACCOUNT || !process.env.PASSWORD_ACCOUNT) return console.log(`Définissez un nom d'utilisteur et un mot de passe`);
     const puppeteer = require('puppeteer');
     
     const browser = await puppeteer.launch({
-        headless: true,
-        // headless: false,
+        // headless: true,
+        headless: false,
         defaultViewport: null,
-        userDataDir: `${__dirname}/eylonSession`
+        userDataDir: `${__dirname}/eylonSession`,
+        args: [
+            "--no-sandbox"
+        ]
     })
     const pages = await browser.pages();
     const page = pages.length > 0 ? pages[0] : await browser.newPage();
@@ -52,10 +59,10 @@ const main = async () => {
         if (url == 'https://paris-jean-bouin.kirola.fr/users/sign_in') {
             await page.waitForTimeout(200);
             await page.waitForSelector('[id="user_login"]');
-            await page.type('[id="user_login"]', process.env.EMAIL, {delay: 100});
+            await page.type('[id="user_login"]', process.env.EMAIL_ACCOUNT, {delay: 100});
             await page.waitForTimeout(200);
             await page.waitForSelector('[id="user_password"]');
-            await page.type('[id="user_password"]', process.env.PASSWORD, {delay: 100});
+            await page.type('[id="user_password"]', process.env.PASSWORD_ACCOUNT, {delay: 100});
             await page.waitForTimeout(200);
             await page.waitForSelector('[id="user_remember_me"]');
             await page.click('[id="user_remember_me"]');
@@ -79,7 +86,9 @@ const main = async () => {
         await page.click(`[id="track"] > div:nth-child(14) > [data-start-hour="${heure}"]`);
         // await page.waitForSelector(`[id="col-526-${date}"] > [data-start-hour="${heure}"]`);
         // await page.click(`[id="col-526-${date}"] > [data-start-hour="${heure}"]`);
-        await page.waitForSelector('.modal--js-active');
+        await page.waitForSelector('.modal--js-active', {
+            timeout: 20000
+        });
         await page.type('[data-target="app--autocomplete.input"]', partenaire.firstname, {delay: 100});
         await page.waitForSelector(`[data-id="${partenaire.id}"]`, {
             visible: true
@@ -106,8 +115,10 @@ const main = async () => {
             }],
         };
         await transporter.sendMail(mailOption, (err) => {
-            console.log(`Le mail n'a pas pu être envoyée`, err)
+            if (err) console.log(`Le mail n'a pas pu être envoyée`, err);
+            console.log(`Le mail a été envoyer avec succès`);
         });
+        console.log('Réservation effectuée avec succès')
     } catch (error) {
         await page.screenshot({
             path: `${__dirname}/reservation/error-resa-${date}:${heure}.png`,
@@ -127,7 +138,8 @@ const main = async () => {
             }],
         };
         await transporter.sendMail(mailOption, (err) => {
-            console.log(`Le mail n'a pas pu être envoyée`, err)
+            if (err) console.log(`Le mail n'a pas pu être envoyée`, err);
+            console.log(`Le mail a été envoyer avec succès`);
         });
         console.log('error script tennis :', error)
     } finally {
@@ -135,15 +147,15 @@ const main = async () => {
     }
 
 }
-// main()
-try {
-    const reservation = new CronJob({
-        // cronTime: '0 * 12 * * *',
-        cronTime: '1 0 8 * * *',
-        onTick: main(),
-        timeZone: 'Europe/Paris',
-        start: true
-    })
-} catch (error) {
-    console.log('Error tâche cron :', error)
-}
+main()
+// try {
+//     const reservation = new CronJob({
+//         // cronTime: '0 * 12 * * *',
+//         cronTime: '1 0 8 * * *',
+//         onTick: main(),
+//         timeZone: 'Europe/Paris',
+//         start: true
+//     })
+// } catch (error) {
+//     console.log('Error tâche cron :', error)
+// }
